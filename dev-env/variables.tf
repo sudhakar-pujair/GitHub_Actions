@@ -38,10 +38,6 @@ variable "project_name" {
   type = string
 }
 
-variable "amis" {
-  type = string
-}
-
 variable "instance_type" {
   type = string
 }
