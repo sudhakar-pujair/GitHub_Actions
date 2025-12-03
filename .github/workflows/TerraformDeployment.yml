@@ -114,14 +114,16 @@ jobs:
       - name: Terraform Plan
         if: env.ENV_DESTROY == 'NO'
         run: |
-          if [ ${GITHUB_REF} == 'refs/heads/development' ]; then
+          if [ "${GITHUB_REF}" = "refs/heads/development" ]; then
             echo "Running Terraform Plan For Development Environment"
             terraform workspace select dev
             terraform plan --var-file=dev.tfvars
-          elif [ ${GITHUB_REF} == 'refs/heads/production' ]; then
+
+          elif [ "${GITHUB_REF}" = "refs/heads/production" ]; then
             echo "Running Terraform Plan For Production Environment"
             terraform workspace select prod
             terraform plan --var-file=prod.tfvars
+
           else
-            echo "Nothing Is Deployed As The Branch Is Not Dev OR Prod."
+            echo "Not running Terraform Plan. Branch is not dev or prod."
           fi
