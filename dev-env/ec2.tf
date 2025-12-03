@@ -3,7 +3,10 @@
 module "dev_test_instance" {
   source = "../modules/compute"
   environment     = module.dev_vpc_1.environment
-  amis            = var.amis
+  amis = {
+    us-east-1 = "ami-0ecb62995f68bb549" # ubuntu 20.04 LTS
+    us-east-2 = "ami-0f5fcdfbd140e4ab7" # ubuntu 20.04 LTS
+  }
   aws_region      = var.aws_region
   sg_id           = module.dev_test_sg.sg_id
   instance_type   = var.instance_type
