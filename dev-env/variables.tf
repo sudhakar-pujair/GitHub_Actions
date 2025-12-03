@@ -46,10 +46,6 @@ variable "instance_type" {
   type = string
 }
 
-variable "sg_id" {
-  type = list(string)
-}
-
 variable "service_ports" {
   type = list(number)
 }

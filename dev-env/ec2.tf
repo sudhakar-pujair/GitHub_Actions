@@ -5,7 +5,7 @@ module "dev_test_instance" {
   environment     = module.dev_vpc_1.environment
   amis            = var.amis
   aws_region      = var.aws_region
-  sg_id           = var.sg_id
+  sg_id           = module.dev_test_sg.sg_id
   instance_type   = var.instance_type
   key_name        = var.key_name
   project_name    = var.project_name
