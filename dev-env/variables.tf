@@ -1,4 +1,4 @@
-## Variables declaration
+## Variables declaration details
 variable "aws_region" {
   type = string
 }
