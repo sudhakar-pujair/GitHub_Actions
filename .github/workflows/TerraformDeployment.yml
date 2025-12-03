@@ -1,0 +1,72 @@
+name: AWS Terraform Workflow
+
+on:
+  push:
+    branches:
+      - main
+    paths-ignore:
+      - 'Manual.yml'
+      - 'ReadMe.md'
+
+env:
+  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  AWS_REGION: "us-east-1"
+  ENV_DESTROY: "NO"
+  TERRAFORM_DESTROY: ${{ vars.TERRAFORM_DESTROY }}
+  TERRAFORM_VERSION: "1.14.0"
+
+jobs:
+  terraform-initiate:
+    if: ${{ vars.TERRAFORM_DESTROY == 'NO' }}
+    name: 'Stage_1 - Terraform Initialization'
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./dev-env
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: ${{ env.TERRAFORM_VERSION }}
+
+      - name: Terraform Version
+        run: terraform version
+
+      - name: Terraform Init, Format, Validate
+        run: terraform init && terraform fmt && terraform validate
+
+      - name: Create Workspaces
+        run: |
+          terraform workspace select dev || terraform workspace new dev
+          terraform workspace select prod || terraform workspace new prod
+          terraform workspace list
+
+  terraform-plan:
+    if: ${{ vars.TERRAFORM_DESTROY == 'NO' }}
+    name: 'Stage_2 - Terraform Plan'
+    runs-on: ubuntu-latest
+    needs: terraform-initiate
+    defaults:
+      run:
+        working-directory: ./dev-env
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: ${{ env.TERRAFORM_VERSION }}
+
+      - name: Terraform Init
+        run: terraform init
+
+      - name: Terraform Plan
+        run: |
+          echo "Running Terraform plan on main branch"
+          terraform workspace select dev
+          terraform plan -var-file=dev.tfvars
